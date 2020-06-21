@@ -1,0 +1,61 @@
+[sampledata,FS] = audioread('TstVideo.mp4');
+%sampledata保存音频信号数据,FS是音频采样率
+%扩大下振幅,从而增大音量
+zhenfu=10*sampledata;
+%播放音频,可以测试
+%sound(zhenfu,FS);
+%保存音频sound.wav文件
+audiowrite('sound.wav',zhenfu,FS);
+%处理视频中的背景图片
+mov=VideoReader('TstVideo.mp4');%读取视频
+N=mov.NumberOfFrames;%读取视频帧数
+%173帧,每一帧都为图片
+p_num=1;
+cishu=0;
+for ii=1:170
+    I=read(mov,ii);
+%x=rgb2gray(I);
+%二值图,设置个阈值,因为左下角的光不够,老识别成黑色
+    x2=im2bw(I,110/255);
+    erzhi=x2;
+    %imshow(x)
+    %imshow(x2)
+    %视频中的像素是480*360(I)
+    %图片的像素是640*480(I2)
+    %所以要缩放下图片的像素跟视频中的像素值一样
+    %缩放结果为I3
+    I2=imread('kaoshi.png');
+    I3=imresize(I2,[480,360]);
+    I4=I3;
+    for i=1:480
+        for j=1:360
+            if erzhi(i,j)==0
+                I4(i,j,1)=I(i,j,1);
+                I4(i,j,2)=I(i,j,2);
+                I4(i,j,3)=I(i,j,3);
+            elseif erzhi(i,j)==1
+                I4(i,j,1)=I3(i,j,1);
+                I4(i,j,2)=I3(i,j,2);
+                I4(i,j,3)=I3(i,j,3);   
+            end
+        end
+    end
+    imshow(x2)
+    title(sprintf('第%d帧',ii));
+    str1='E:\大三下\物联网工程设计与实践\图片\';
+    str2=num2str(p_num);
+    str3='.jpg';
+    save_path=[str1,str2,str3];
+    imwrite(I4,save_path);
+    p_num=p_num+1;
+    %计算小球摆动次数
+    %二值图小球是黑的,0
+    %选取右侧170,360位置
+    if x2(170,360)==0
+        cishu=cishu+1
+    end
+    cishu
+end
+
+            
+
